@@ -24,9 +24,8 @@ const options = { next: { revalidate: 30 } };
 
 // ✅ ONLY CHANGE: Properly type `params` using PageProps
 type PageProps = {
-  params: {
-    slug: string;
-  };
+  params: { slug: string };
+
 };
 
 export default async function PostPage({ params }: PageProps) {
