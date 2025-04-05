@@ -22,11 +22,14 @@ const urlFor = (source: SanityImageSource) =>
 
 const options = { next: { revalidate: 30 } };
 
-export default async function PostPage({
-  params,
-}: {
-  params: { slug: string };
-}) {
+// ✅ ONLY CHANGE: Properly type `params` using PageProps
+type PageProps = {
+  params: {
+    slug: string;
+  };
+};
+
+export default async function PostPage({ params }: PageProps) {
   try {
     const post = await client.fetch<SanityDocument>(POST_QUERY, params, options);
 
@@ -43,18 +46,14 @@ export default async function PostPage({
       );
     }
 
-    // Safely check for image
     const postImageUrl = post?.image
       ? urlFor(post.image)?.width(550).height(310).url()
-      : "/placeholder.png"; // Path to fallback image if no image is available
+      : null;
 
     return (
       <main className="container mx-auto min-h-screen max-w-3xl p-8 flex flex-col gap-4">
-        <Link href="/" className="hover:underline">
-          ← Back to posts
-        </Link>
-        
-        {/* Display Image if Available */}
+        <Link href="/" className="hover:underline">← Back to posts</Link>
+
         {postImageUrl && (
           // eslint-disable-next-line @next/next/no-img-element
           <img
@@ -66,18 +65,13 @@ export default async function PostPage({
           />
         )}
 
-        {/* Display Post Title */}
         <h1 className="text-4xl font-bold mb-8">{post.title}</h1>
 
-        {/* Display Post Metadata */}
         <div className="prose">
           <p>Published: {new Date(post.publishedAt).toLocaleDateString()}</p>
-
-          {/* Render PortableText if Body Exists */}
           {Array.isArray(post.body) && <PortableText value={post.body} />}
         </div>
 
-        {/* Display Tags */}
         {post.tags?.length > 0 && (
           <div className="flex gap-2 mt-2">
             {post.tags.map((tag: string, index: number) => (
