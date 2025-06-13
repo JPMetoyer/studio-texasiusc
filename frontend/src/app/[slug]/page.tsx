@@ -4,7 +4,7 @@ import type { SanityImageSource } from "@sanity/image-url/lib/types/types";
 import { client } from "@/sanity/client";
 import Link from "next/link";
 
-// GROQ query
+// GROQ query to fetch the post by slug
 const POST_QUERY = `*[_type == "post" && slug.current == $slug][0]{
   _id,
   title,
@@ -15,25 +15,21 @@ const POST_QUERY = `*[_type == "post" && slug.current == $slug][0]{
   body
 }`;
 
-// Set up image URL builder
+// Set up image URL builder from Sanity config
 const { projectId, dataset } = client.config();
 const urlFor = (source: SanityImageSource) =>
   projectId && dataset
     ? imageUrlBuilder({ projectId, dataset }).image(source)
     : null;
 
-// ISR options
+// Optional: Revalidate every 30 seconds (ISR)
 const options = { next: { revalidate: 30 } };
 
-// ✅ ✅ ✅ Fixed typing for App Router
-type PageProps = {
-  params: {
-    slug: string;
-  };
-};
+// ✅ No custom PageProps type — inline only
+export default async function PostPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
 
-export default async function PostPage({ params }: PageProps) {
-  const post = await client.fetch<SanityDocument>(POST_QUERY, params, options);
+  const post = await client.fetch<SanityDocument>(POST_QUERY, { slug }, options);
 
   if (!post) {
     return (
