@@ -4,6 +4,7 @@ import type { SanityImageSource } from "@sanity/image-url/lib/types/types";
 import { client } from "@/sanity/client";
 import Link from "next/link";
 
+// GROQ query
 const POST_QUERY = `*[_type == "post" && slug.current == $slug][0]{
   _id,
   title,
@@ -14,22 +15,33 @@ const POST_QUERY = `*[_type == "post" && slug.current == $slug][0]{
   body
 }`;
 
+// Set up image URL builder
 const { projectId, dataset } = client.config();
 const urlFor = (source: SanityImageSource) =>
   projectId && dataset
     ? imageUrlBuilder({ projectId, dataset }).image(source)
     : null;
 
+// ISR options
 const options = { next: { revalidate: 30 } };
 
-export default async function PostPage({ params }: { params: { slug: string } }) {
+// ✅ ✅ ✅ Fixed typing for App Router
+type PageProps = {
+  params: {
+    slug: string;
+  };
+};
+
+export default async function PostPage({ params }: PageProps) {
   const post = await client.fetch<SanityDocument>(POST_QUERY, params, options);
 
   if (!post) {
     return (
       <main className="container mx-auto min-h-screen max-w-3xl p-8">
         <h1 className="text-4xl font-bold mb-8">Post Not Found</h1>
-        <Link href="/" className="hover:underline">← Back to posts</Link>
+        <Link href="/" className="hover:underline">
+          ← Back to posts
+        </Link>
       </main>
     );
   }
