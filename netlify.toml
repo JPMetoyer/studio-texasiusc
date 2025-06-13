@@ -1,9 +1,7 @@
 [build]
   base = "frontend"
   command = "npm run build"
-  publish = "frontend/.next/static"
+  publish = ".next"
 
-[[redirects]]
-  from = "/*"
-  to = "/"
-  status = 200
+[[plugins]]
+  package = "@netlify/next"
