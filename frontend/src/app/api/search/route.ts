@@ -24,7 +24,7 @@ export async function GET(request: Request) {
         (title match $query || $query in tags || body[].children[].text match $query)
       ]{
         _id,
-        title,
+        title, 
         slug,
         publishedAt,
         tags
