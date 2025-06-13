@@ -1,0 +1,9 @@
+[build]
+  base = "frontend"
+  command = "npm run build"
+  publish = "frontend/.next/static"
+
+[[redirects]]
+  from = "/*"
+  to = "/"
+  status = 200
